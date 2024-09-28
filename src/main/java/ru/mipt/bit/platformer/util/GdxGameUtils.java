@@ -13,7 +13,10 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
+import ru.mipt.bit.platformer.GameObjects.Direction;
+
 import java.util.NoSuchElementException;
+import static java.util.Map.entry; 
 
 import static com.badlogic.gdx.math.MathUtils.clamp;
 
@@ -68,12 +71,23 @@ public final class GdxGameUtils {
         return new GridPoint2(point).add(1, 0);
     }
 
-    public static void drawTextureRegionUnscaled(Batch batch, TextureRegion region, Rectangle rectangle, float rotation) {
+    public static void drawTextureRegionUnscaled(Batch batch, TextureRegion region, Rectangle rectangle, Direction direction) {
+        java.util.Map<Direction, Float> dir2angleMap = java.util.Map.ofEntries(
+                entry(Direction.Up, 90f),
+                entry(Direction.Right, 0f),
+                entry(Direction.Down, 270f),
+                entry(Direction.Left, 180f));
+
         int regionWidth = region.getRegionWidth();
         int regionHeight = region.getRegionHeight();
         float regionOriginX = regionWidth / 2f;
         float regionOriginY = regionHeight / 2f;
-        batch.draw(region, rectangle.x, rectangle.y, regionOriginX, regionOriginY, regionWidth, regionHeight, 1f, 1f, rotation);
+        batch.draw(region, rectangle.x, rectangle.y, regionOriginX, regionOriginY, regionWidth, regionHeight, 1f, 1f,
+                dir2angleMap.get(direction));
+    }
+
+    public static void drawTextureRegionUnscaled(Batch batch, TextureRegion region, Rectangle rectangle) {
+        drawTextureRegionUnscaled(batch, region, rectangle, Direction.Left);
     }
 
     public static Rectangle createBoundingRectangle(TextureRegion region) {
