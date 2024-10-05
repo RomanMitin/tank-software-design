@@ -13,6 +13,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Interpolation;
 
+import ru.mipt.bit.platformer.util.ButtonHandler;
 import ru.mipt.bit.platformer.util.TileMovement;
 import ru.mipt.bit.platformer.GameObjects.MovableObj;
 import ru.mipt.bit.platformer.Visualizer.GameObjDrawable;
@@ -24,6 +25,8 @@ import static java.util.Map.entry;
 import static com.badlogic.gdx.Input.Keys.*;
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
+
+import java.util.concurrent.Callable;
 
 public class GameDesktopLauncher implements ApplicationListener {
 
@@ -39,6 +42,8 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     private GameObj tree;
     private GameObjDrawable treeDrawable;
+
+    private ButtonHandler buttonHandler;
 
     @Override
     public void create() {
@@ -63,43 +68,40 @@ public class GameDesktopLauncher implements ApplicationListener {
         treeDrawable = new GameObjDrawable(tree, greenTreeTexture);
 
         moveRectangleAtTileCenter(groundLayer, treeDrawable.getRectangle(), tree.getCoordinates());
-    }
 
-    private boolean check_diraction_key_pressed(Direction direction) {
-        // Map<Direction, Integer> map = Map.of("A", 1, "B", 2, "C", 3);
+        buttonHandler = new ButtonHandler();
 
-        java.util.Map<Direction, Integer> dir2intMap = java.util.Map.ofEntries(
-                entry(Direction.Up, W),
-                entry(Direction.Right, D),
-                entry(Direction.Down, S),
-                entry(Direction.Left, A));
+        Callable<Integer> handlerUp = () -> {
+            tank.move(tree.getCoordinates(), Direction.Up);
+            return null;
+        };
 
-        return Gdx.input.isKeyPressed(dir2intMap.get(direction));
-    }
+        Callable<Integer> handlerLeft = () -> {
+            tank.move(tree.getCoordinates(), Direction.Left);
+            return null;
+        };
 
-    private void handle_move_key_board_inputs() {
-        Direction[] diractions_to_check = {Direction.Up, Direction.Right, Direction.Down, Direction.Left};
-        for (Direction direction : diractions_to_check) {
-            if (check_diraction_key_pressed(direction)) {
-                if (tank.isMoving()) {
-                    switch (direction) {
-                        case Up:
-                            tank.moveUp(tree.getCoordinates());
-                            break;
-                        case Right:
-                            tank.moveRight(tree.getCoordinates());
-                            break;
-                        case Down:
-                            tank.moveDown(tree.getCoordinates());
-                            break;
-                        case Left:
-                            tank.moveLeft(tree.getCoordinates());
-                            break;
-                    }
+        Callable<Integer> handlerDown = () -> {
+            tank.move(tree.getCoordinates(), Direction.Down);
+            return null;
+        };
 
-                }
-            }
-        }
+        Callable<Integer> handlerRight = () -> {
+            tank.move(tree.getCoordinates(), Direction.Right);
+            return null;
+        };
+
+        buttonHandler.registerButtonHandler(UP, handlerUp);
+        buttonHandler.registerButtonHandler(W, handlerUp);
+
+        buttonHandler.registerButtonHandler(LEFT, handlerLeft);
+        buttonHandler.registerButtonHandler(A, handlerLeft);
+
+        buttonHandler.registerButtonHandler(DOWN, handlerDown);
+        buttonHandler.registerButtonHandler(S, handlerDown);
+
+        buttonHandler.registerButtonHandler(RIGHT, handlerRight);
+        buttonHandler.registerButtonHandler(D, handlerRight);
 
     }
 
@@ -112,13 +114,13 @@ public class GameDesktopLauncher implements ApplicationListener {
         // get time passed since the last render
         float deltaTime = Gdx.graphics.getDeltaTime();
 
-        handle_move_key_board_inputs();
+        buttonHandler.handleButtonInputs();
 
         // calculate interpolated player screen coordinates
         tileMovement.moveRectangleBetweenTileCenters(tankDrawable.getRectangle(), tank.getCoordinates(), tank.getDestinationCoordinates(),
                 tank.getMovementProgress());
 
-        tank.recalcualte_position(deltaTime);
+        tank.recalculate_position(deltaTime);
 
         // render each tile of the level
         levelRenderer.render();

@@ -6,7 +6,7 @@ import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 
 public class MovableObj extends GameObj{
-  static final float timeBetweenMoves = 0.4f;
+  static public final float timeBetweenMoves = 0.4f;
 
   GridPoint2 DestinationCoordinates;
   float MovementProgress;
@@ -17,48 +17,30 @@ public class MovableObj extends GameObj{
     MovementProgress = 1f;
   }  
 
-  public MovableObj(GridPoint2 treeObstacleCoordinates, Direction direction) {
-    super(treeObstacleCoordinates, direction);
+  public MovableObj(GridPoint2 Coordinates, Direction direction) {
+    super(Coordinates, direction);
+    DestinationCoordinates = new GridPoint2(1, 1);
+    MovementProgress = 1f;
   }
 
   public boolean isMoving() {
     return isEqual(MovementProgress, 1f);
   }
 
-  public void moveUp(GridPoint2 obstacleCoordinate) {
-    if (!obstacleCoordinate.equals(incrementedY(coordinates))) {
-      DestinationCoordinates.y++;
-      MovementProgress = 0f;
+  public void move(GridPoint2 obstacleCoordinate, Direction moveDirection) {
+    if (this.isMoving()) {
+      GridPoint2 destPoint = new GridPoint2(coordinates);
+      destPoint.add(moveDirection.getOffset());
+
+      if (!obstacleCoordinate.equals(destPoint)) {
+        DestinationCoordinates = destPoint;
+        MovementProgress = 0f;
+      }
+      direction = moveDirection;
     }
-    direction = Direction.Up;
   }
 
-  public void moveLeft(GridPoint2 obstacleCoordinate) {
-    if (!obstacleCoordinate.equals(decrementedX(coordinates))) {
-      DestinationCoordinates.x--;
-      MovementProgress = 0f;
-    }
-    direction = Direction.Left;
-  }
-
-  public void moveDown(GridPoint2 obstacleCoordinate) {
-    if (!obstacleCoordinate.equals(decrementedY(coordinates))) {
-      DestinationCoordinates.y--;
-      MovementProgress = 0f;
-    }
-    direction = Direction.Down;
-  }
-
-  public void moveRight(GridPoint2 obstacleCoordinate) {
-    if (!obstacleCoordinate.equals(incrementedX(coordinates))) {
-      DestinationCoordinates.x++;
-      MovementProgress = 0f;
-    }
-    direction = Direction.Right;
-
-  }
-
-  public void recalcualte_position(float deltaTime) {
+  public void recalculate_position(float deltaTime) {
     MovementProgress = continueProgress(MovementProgress, deltaTime, timeBetweenMoves);
     if (isEqual(MovementProgress, 1f)) {
       coordinates.set(DestinationCoordinates);
