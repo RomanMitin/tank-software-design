@@ -6,16 +6,15 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
 import ru.mipt.bit.platformer.GameObjects.GameObj;
-import ru.mipt.bit.platformer.util.TileMovement;
 
 import static ru.mipt.bit.platformer.util.GdxGameUtils.createBoundingRectangle;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.drawTextureRegionUnscaled;
 
 public class GameObjDrawable implements Drawable{
-    private GameObj gameObject;
+    protected GameObj gameObject;
+    protected Rectangle rectangle;
     private Texture texture;
     private TextureRegion textureRegion;
-    private Rectangle rectangle;
 
     public GameObjDrawable(GameObj gameObject, Texture texture) {
         this.gameObject = gameObject;
@@ -25,20 +24,16 @@ public class GameObjDrawable implements Drawable{
     }
 
     @Override
-    public void drawTexture(Batch batch) {
-
+    public void drawTexture(Batch batch, float deltaTime) {
         drawTextureRegionUnscaled(batch, textureRegion, rectangle, gameObject.getDirection());
+    }
+
+    @Override
+    public void dispose() {
+        texture.dispose();
     }
 
     public Rectangle getRectangle() {
         return rectangle;
-    }
-
-    public Texture getTexture() {
-        return texture;
-    }
-
-    public TextureRegion getTextureRegion() {
-        return textureRegion;
     }
 }

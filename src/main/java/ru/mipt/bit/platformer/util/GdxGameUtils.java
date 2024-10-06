@@ -16,7 +16,6 @@ import com.badlogic.gdx.math.Vector2;
 import ru.mipt.bit.platformer.GameObjects.Direction;
 
 import java.util.NoSuchElementException;
-import static java.util.Map.entry; 
 
 import static com.badlogic.gdx.math.MathUtils.clamp;
 

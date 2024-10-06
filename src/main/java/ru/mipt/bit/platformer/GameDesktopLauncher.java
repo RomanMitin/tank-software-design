@@ -12,15 +12,16 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.utils.Array;
 
 import ru.mipt.bit.platformer.util.ButtonHandler;
 import ru.mipt.bit.platformer.util.TileMovement;
 import ru.mipt.bit.platformer.GameObjects.MovableObj;
 import ru.mipt.bit.platformer.Visualizer.GameObjDrawable;
+import ru.mipt.bit.platformer.Visualizer.MovableObjDrawable;
 import ru.mipt.bit.platformer.GameObjects.Direction;
 import ru.mipt.bit.platformer.GameObjects.GameObj;
-
-import static java.util.Map.entry; 
+import ru.mipt.bit.platformer.Visualizer.Drawable;
 
 import static com.badlogic.gdx.Input.Keys.*;
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
@@ -34,14 +35,9 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     private TiledMap level;
     private MapRenderer levelRenderer;
-    private TileMovement tileMovement;
 
-    // player current position coordinates on level 10x8 grid (e.g. x=0, y=1)
-    private MovableObj tank;
-    private GameObjDrawable tankDrawable;
-
-    private GameObj tree;
-    private GameObjDrawable treeDrawable;
+    private Array<GameObj> gameObjects;
+    private Array<Drawable> drawableObjects;
 
     private ButtonHandler buttonHandler;
 
@@ -53,19 +49,25 @@ public class GameDesktopLauncher implements ApplicationListener {
         level = new TmxMapLoader().load("level.tmx");
         levelRenderer = createSingleLayerMapRenderer(level, batch);
         TiledMapTileLayer groundLayer = getSingleLayer(level);
-        tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
+        TileMovement tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
 
-        tank = new MovableObj();
-        tree = new GameObj();
+        MovableObj tank = new MovableObj();
+        GameObj tree = new GameObj();
+        
+        gameObjects = new Array<>();
+        gameObjects.add(tank, tree);
 
         // Texture decodes an image file and loads it into GPU memory, it represents a
         // native resource
         Texture blueTankTexture = new Texture("images/tank_blue.png");
 
-        tankDrawable = new GameObjDrawable(tank, blueTankTexture);
+        MovableObjDrawable tankDrawable = new MovableObjDrawable(tank, blueTankTexture, tileMovement);
 
         Texture greenTreeTexture = new Texture("images/greenTree.png");
-        treeDrawable = new GameObjDrawable(tree, greenTreeTexture);
+        GameObjDrawable treeDrawable = new GameObjDrawable(tree, greenTreeTexture);
+
+        drawableObjects = new Array<>();
+        drawableObjects.add((Drawable)tankDrawable, (Drawable)treeDrawable);
 
         moveRectangleAtTileCenter(groundLayer, treeDrawable.getRectangle(), tree.getCoordinates());
 
@@ -116,23 +118,15 @@ public class GameDesktopLauncher implements ApplicationListener {
 
         buttonHandler.handleButtonInputs();
 
-        // calculate interpolated player screen coordinates
-        tileMovement.moveRectangleBetweenTileCenters(tankDrawable.getRectangle(), tank.getCoordinates(), tank.getDestinationCoordinates(),
-                tank.getMovementProgress());
-
-        tank.recalculate_position(deltaTime);
-
         // render each tile of the level
         levelRenderer.render();
 
         // start recording all drawing commands
         batch.begin();
 
-        // render player
-        tankDrawable.drawTexture(batch);
-
-        // render tree obstacle
-        treeDrawable.drawTexture(batch);
+        for (Drawable drawable : drawableObjects) {
+            drawable.drawTexture(batch, deltaTime);
+        }
 
         // submit all drawing requests
         batch.end();
@@ -155,10 +149,10 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     @Override
     public void dispose() {
-        // dispose of all the native resources (classes which implement
-        // com.badlogic.gdx.utils.Disposable)
-        treeDrawable.getTexture().dispose();
-        tankDrawable.getTexture().dispose();
+        // dispose of all the native resources (classes which implement com.badlogic.gdx.utils.Disposable)
+        for(Drawable drawable : drawableObjects) {
+            drawable.dispose();
+        }
         level.dispose();
         batch.dispose();
     }
