@@ -11,7 +11,7 @@ public class GameObjTest {
     @Test
     public void defaultCtorTest() {
         // Setup
-        GameObj obj = new GameObj();
+        GameObj obj = new GameObj(GameObjType.Tree);
 
         // Execution
         Direction dir = obj.getDirection();

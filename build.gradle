@@ -25,3 +25,12 @@ dependencies {
     implementation deps.gdx.backend_lwjgl3
     implementation deps.gdx.platform_desktop
 }
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+}
+
+dependencies {
+   implementation group: 'org.json', name: 'json', version: '20141113'
+}

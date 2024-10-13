@@ -3,6 +3,7 @@ package ru.mipt.bit.platformer.GameObjects;
 import org.junit.jupiter.api.Test;
 
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.utils.Array;
 
 import org.junit.jupiter.api.Assertions;
 
@@ -56,19 +57,19 @@ public class MovableObjTest {
         MovableObj obj = new MovableObj(expected_coord, expected_dir);
 
         // Execution
-        obj.move(new GridPoint2(), Direction.Up);
+        obj.move(new Array<>(), Direction.Up);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(new GridPoint2(1, 2), obj.getCoordinates());
 
-        obj.move(new GridPoint2(), Direction.Right);
+        obj.move(new Array<>(), Direction.Right);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(new GridPoint2(2, 2), obj.getCoordinates());
 
-        obj.move(new GridPoint2(), Direction.Down);
+        obj.move(new Array<>(), Direction.Down);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(new GridPoint2(2, 1), obj.getCoordinates());
 
-        obj.move(new GridPoint2(), Direction.Left);
+        obj.move(new Array<>(), Direction.Left);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(new GridPoint2(1, 1), obj.getCoordinates());
 
@@ -85,19 +86,27 @@ public class MovableObjTest {
         MovableObj obj = new MovableObj(expected_coord, expected_dir);
 
         // Execution
-        obj.move(new GridPoint2(1, 2), Direction.Up);
+        Array<GameObj> arrayObjects = new Array<GameObj>();
+        arrayObjects.add(new GameObj(new GridPoint2(1, 2), Direction.Down));
+        obj.move(arrayObjects, Direction.Up);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(expected_coord, obj.getCoordinates());
 
-        obj.move(new GridPoint2(2, 1), Direction.Right);
+        arrayObjects = new Array<GameObj>();
+        arrayObjects.add(new GameObj(new GridPoint2(2, 1), Direction.Down));
+        obj.move(arrayObjects, Direction.Right);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(expected_coord, obj.getCoordinates());
 
-        obj.move(new GridPoint2(1, 0), Direction.Down);
+        arrayObjects = new Array<GameObj>();
+        arrayObjects.add(new GameObj(new GridPoint2(1, 0), Direction.Down));
+        obj.move(arrayObjects, Direction.Down);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(expected_coord, obj.getCoordinates());
 
-        obj.move(new GridPoint2(0, 1), Direction.Left);
+        arrayObjects = new Array<GameObj>();
+        arrayObjects.add(new GameObj(new GridPoint2(0, 1), Direction.Down));
+        obj.move(arrayObjects, Direction.Left);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(expected_coord, obj.getCoordinates());
 

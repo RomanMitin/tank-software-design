@@ -1,8 +1,10 @@
 package ru.mipt.bit.platformer.GameObjects;
 
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.utils.Array;
 
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
+
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 
 public class MovableObj extends GameObj{
@@ -12,14 +14,12 @@ public class MovableObj extends GameObj{
   float MovementProgress;
 
   public MovableObj() {
-    DestinationCoordinates = new GridPoint2(1, 1);
-    direction = Direction.Left;
-    MovementProgress = 1f;
+    this(new GridPoint2(1, 1), Direction.Left);
   }  
 
   public MovableObj(GridPoint2 Coordinates, Direction direction) {
-    super(Coordinates, direction);
-    DestinationCoordinates = new GridPoint2(1, 1);
+    super(Coordinates, direction, GameObjType.PlayerTank);
+    DestinationCoordinates = new GridPoint2(Coordinates);
     MovementProgress = 1f;
   }
 
@@ -27,12 +27,22 @@ public class MovableObj extends GameObj{
     return isEqual(MovementProgress, 1f);
   }
 
-  public void move(GridPoint2 obstacleCoordinate, Direction moveDirection) {
+  private boolean isCollide(Array<GameObj> obstacleCoordinate, GridPoint2 point) {
+    for (GameObj obj : obstacleCoordinate) {
+      if (obj.getCoordinates().equals(point)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  public void move(Array<GameObj> obstacleCoordinates, Direction moveDirection) {
     if (this.isMoving()) {
       GridPoint2 destPoint = new GridPoint2(coordinates);
       destPoint.add(moveDirection.getOffset());
 
-      if (!obstacleCoordinate.equals(destPoint)) {
+      if (!isCollide(obstacleCoordinates, destPoint)) {
         DestinationCoordinates = destPoint;
         MovementProgress = 0f;
       }
@@ -45,10 +55,6 @@ public class MovableObj extends GameObj{
     if (isEqual(MovementProgress, 1f)) {
       coordinates.set(DestinationCoordinates);
     }
-  }
-
-  public GridPoint2 getCoordinates() {
-    return coordinates;
   }
 
   public GridPoint2 getDestinationCoordinates() {
