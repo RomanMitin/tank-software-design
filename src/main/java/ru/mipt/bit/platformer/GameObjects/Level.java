@@ -2,39 +2,38 @@ package ru.mipt.bit.platformer.GameObjects;
 
 import java.util.concurrent.Callable;
 
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import static com.badlogic.gdx.Input.Keys.*;
 
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 
+import ru.mipt.bit.platformer.util.AITanksHandler;
 import ru.mipt.bit.platformer.util.ButtonHandler;
+import ru.mipt.bit.platformer.util.TankAI;
 
 public class Level {
-    private TiledMap tiledMap;
-    private MovableObj tank;
+    private MovableObj playerTank;
     private Array<GameObj> gameObjects;
 
     public void registerPlayerTankHandlers(ButtonHandler buttonHandler) {
         Callable<Integer> handlerUp = () -> {
-            tank.move(gameObjects, Direction.Up);
-            return null;
+            playerTank.move(gameObjects, Direction.Up);
+            return 0;
         };
 
         Callable<Integer> handlerLeft = () -> {
-            tank.move(gameObjects, Direction.Left);
-            return null;
+            playerTank.move(gameObjects, Direction.Left);
+            return 0;
         };
 
         Callable<Integer> handlerDown = () -> {
-            tank.move(gameObjects, Direction.Down);
-            return null;
+            playerTank.move(gameObjects, Direction.Down);
+            return 0;
         };
 
         Callable<Integer> handlerRight = () -> {
-            tank.move(gameObjects, Direction.Right);
-            return null;
+            playerTank.move(gameObjects, Direction.Right);
+            return 0;
         };
 
         buttonHandler.registerButtonHandler(UP, handlerUp);
@@ -51,26 +50,40 @@ public class Level {
     }
 
     public Level() {
-        this(new GridPoint2(1, 1), new Array<GridPoint2>());
+        this(new GridPoint2(1, 1), new Array<GridPoint2>(), new Array<GridPoint2>());
     }
 
-    public Level(GridPoint2 playerTankPosition, Array<GridPoint2> treePositions) {
-        tiledMap = new TmxMapLoader().load("level.tmx");
+    public Level(GridPoint2 playerTankPosition, Array<GridPoint2> treePositions, Array<GridPoint2> aiTanksPostions) {
         gameObjects = new Array<>();
 
-        tank = new MovableObj(playerTankPosition, Direction.Left);
-        gameObjects.add(tank);
+        playerTank = new MovableObj(playerTankPosition, Direction.Left, GameObjType.PlayerTank);
+        gameObjects.add(playerTank);
 
         for(GridPoint2 coord : treePositions) {
             gameObjects.add(new GameObj(coord, Direction.Left));
         }
-    }
-    
-    public TiledMap getTiledMap() {
-        return tiledMap;
+        
+        for(GridPoint2 coord : aiTanksPostions) {
+            gameObjects.add(new MovableObj(coord, Direction.Right, GameObjType.AITank));
+        }
     }
 
     public Array<GameObj> getGameObjects() {
         return gameObjects;
+    }
+
+    public void registerAITanksActions(AITanksHandler aiTanksActions) {
+        for (GameObj gameObj : gameObjects) {
+            if (gameObj.type == GameObjType.AITank) {
+                MovableObj movableObj = (MovableObj)gameObj;
+                Callable<Integer> aitankAction = () -> {
+                    movableObj.move(gameObjects, TankAI.chooseDirection());
+                    return 0;
+                };
+
+                // aiTanksActions.add
+                aiTanksActions.registerAction(aitankAction);
+            }
+        }
     }
 }

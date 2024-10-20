@@ -33,7 +33,7 @@ public class MovableObjTest {
         // Setup
         Direction expected_dir = Direction.Up;
         GridPoint2 expected_coord = new GridPoint2(1, 3);
-        MovableObj obj = new MovableObj(expected_coord, expected_dir);
+        MovableObj obj = new MovableObj(expected_coord, expected_dir, GameObjType.PlayerTank);
 
         // Execution
         Direction dir = obj.getDirection();
@@ -54,7 +54,7 @@ public class MovableObjTest {
         // Setup
         Direction expected_dir = Direction.Up;
         GridPoint2 expected_coord = new GridPoint2(1, 1);
-        MovableObj obj = new MovableObj(expected_coord, expected_dir);
+        MovableObj obj = new MovableObj(expected_coord, expected_dir, GameObjType.PlayerTank);
 
         // Execution
         obj.move(new Array<>(), Direction.Up);
@@ -83,7 +83,7 @@ public class MovableObjTest {
         // Setup
         Direction expected_dir = Direction.Up;
         GridPoint2 expected_coord = new GridPoint2(1, 1);
-        MovableObj obj = new MovableObj(expected_coord, expected_dir);
+        MovableObj obj = new MovableObj(expected_coord, expected_dir, GameObjType.PlayerTank);
 
         // Execution
         Array<GameObj> arrayObjects = new Array<GameObj>();

@@ -3,6 +3,8 @@ package ru.mipt.bit.platformer.GameObjects;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 
+import ru.mipt.bit.platformer.util.GameConstants;
+
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
@@ -10,16 +12,16 @@ import static com.badlogic.gdx.math.MathUtils.isEqual;
 public class MovableObj extends GameObj{
   static public final float timeBetweenMoves = 0.4f;
 
-  GridPoint2 DestinationCoordinates;
+  GridPoint2 destinationCoordinates;
   float MovementProgress;
 
   public MovableObj() {
-    this(new GridPoint2(1, 1), Direction.Left);
+    this(new GridPoint2(1, 1), Direction.Left, GameObjType.PlayerTank);
   }  
 
-  public MovableObj(GridPoint2 Coordinates, Direction direction) {
-    super(Coordinates, direction, GameObjType.PlayerTank);
-    DestinationCoordinates = new GridPoint2(Coordinates);
+  public MovableObj(GridPoint2 Coordinates, Direction direction, GameObjType type) {
+    super(Coordinates, direction, type);
+    destinationCoordinates = new GridPoint2(Coordinates);
     MovementProgress = 1f;
   }
 
@@ -28,7 +30,17 @@ public class MovableObj extends GameObj{
   }
 
   private boolean isCollide(Array<GameObj> obstacleCoordinate, GridPoint2 point) {
+    if (point.x >= GameConstants.levelWidth || point.x < 0)
+      return true;
+    if (point.y >= GameConstants.levelHight || point.y < 0)
+      return true;
     for (GameObj obj : obstacleCoordinate) {
+      if (obj.getType() == GameObjType.PlayerTank || obj.getType() == GameObjType.AITank) {
+        MovableObj movableObj = (MovableObj)obj;
+        if (movableObj.destinationCoordinates.equals(point)) {
+          return true;
+        }
+      }
       if (obj.getCoordinates().equals(point)) {
         return true;
       }
@@ -43,7 +55,7 @@ public class MovableObj extends GameObj{
       destPoint.add(moveDirection.getOffset());
 
       if (!isCollide(obstacleCoordinates, destPoint)) {
-        DestinationCoordinates = destPoint;
+        destinationCoordinates = destPoint;
         MovementProgress = 0f;
       }
       direction = moveDirection;
@@ -53,12 +65,12 @@ public class MovableObj extends GameObj{
   public void recalculate_position(float deltaTime) {
     MovementProgress = continueProgress(MovementProgress, deltaTime, timeBetweenMoves);
     if (isEqual(MovementProgress, 1f)) {
-      coordinates.set(DestinationCoordinates);
+      coordinates.set(destinationCoordinates);
     }
   }
 
   public GridPoint2 getDestinationCoordinates() {
-    return DestinationCoordinates;
+    return destinationCoordinates;
   }
 
   public float getMovementProgress() {

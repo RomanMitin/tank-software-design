@@ -6,12 +6,13 @@ import com.badlogic.gdx.graphics.Texture;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.MapRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 
 import ru.mipt.bit.platformer.GameObjects.GameObj;
-import ru.mipt.bit.platformer.GameObjects.GameObjType;
 import ru.mipt.bit.platformer.GameObjects.Level;
 import ru.mipt.bit.platformer.GameObjects.MovableObj;
 import ru.mipt.bit.platformer.util.TileMovement;
@@ -21,24 +22,38 @@ public class LevelDrawable implements Drawable {
     private Level level;
     private MapRenderer levelRenderer;
     private Array<Drawable> drawableObjects;
+    private TiledMap tiledMap;
+
 
     private void InitializeDrawableObjects(Array<GameObj> gameObjects, TileMovement tileMovement, TiledMapTileLayer groundLayer) {
         drawableObjects = new Array<>();
 
         for(GameObj obj : gameObjects) {
-            if (obj.getType() == GameObjType.PlayerTank) {
-                Texture blueTankTexture = new Texture("images/tank_blue.png");
-                MovableObj tank = (MovableObj)obj;
-                MovableObjDrawable tankDrawable = new MovableObjDrawable(tank, blueTankTexture, tileMovement);
-                drawableObjects.add((Drawable) tankDrawable);
-                moveRectangleAtTileCenter(groundLayer, tankDrawable.getRectangle(), tank.getCoordinates());
-                
-            } else if (obj.getType() == GameObjType.Tree) {
-                GameObj tree = (GameObj)obj;
-                Texture greenTreeTexture = new Texture("images/greenTree.png");
-                GameObjDrawable treeDrawable = new GameObjDrawable(tree, greenTreeTexture);
-                drawableObjects.add((Drawable) treeDrawable);
-                moveRectangleAtTileCenter(groundLayer, treeDrawable.getRectangle(), tree.getCoordinates());
+            switch (obj.getType()) {
+                case PlayerTank:
+                    Texture blueTankTexture = new Texture("images/tank_blue.png");
+                    MovableObj tank = (MovableObj) obj;
+                    MovableObjDrawable tankDrawable = new MovableObjDrawable(tank, blueTankTexture, tileMovement);
+                    drawableObjects.add((Drawable) tankDrawable);
+                    moveRectangleAtTileCenter(groundLayer, tankDrawable.getRectangle(), tank.getCoordinates());
+                    break;
+                case AITank:
+                    Texture aiTankTexture = new Texture("images/tank_blue.png");
+                    MovableObj aiTank = (MovableObj) obj;
+                    MovableObjDrawable aiTankDrawable = new MovableObjDrawable(aiTank, aiTankTexture, tileMovement);
+                    drawableObjects.add((Drawable) aiTankDrawable);
+                    moveRectangleAtTileCenter(groundLayer, aiTankDrawable.getRectangle(), aiTank.getCoordinates());
+                    break;
+                case Tree:
+                    GameObj tree = (GameObj) obj;
+                    Texture greenTreeTexture = new Texture("images/greenTree.png");
+                    GameObjDrawable treeDrawable = new GameObjDrawable(tree, greenTreeTexture);
+                    drawableObjects.add((Drawable) treeDrawable);
+                    moveRectangleAtTileCenter(groundLayer, treeDrawable.getRectangle(), tree.getCoordinates());
+                    break;
+                default:
+                    System.err.println("Unknown object type");
+                    break;
             }
         }
 
@@ -47,9 +62,11 @@ public class LevelDrawable implements Drawable {
 
     public LevelDrawable(Level level, Batch batch) {
         this.level = level;
-        levelRenderer = createSingleLayerMapRenderer(level.getTiledMap(), batch);
-        TiledMapTileLayer groundLayer = getSingleLayer(level.getTiledMap());
+        tiledMap = new TmxMapLoader().load("level.tmx");
+        levelRenderer = createSingleLayerMapRenderer(tiledMap, batch);
+        TiledMapTileLayer groundLayer = getSingleLayer(tiledMap);
         TileMovement tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
+
 
         InitializeDrawableObjects(level.getGameObjects(), tileMovement, groundLayer);
 
@@ -76,7 +93,7 @@ public class LevelDrawable implements Drawable {
         for(Drawable drawable : drawableObjects) {
             drawable.dispose();
         }
-        level.getTiledMap().dispose();
+        tiledMap.dispose();
     }
     
 }

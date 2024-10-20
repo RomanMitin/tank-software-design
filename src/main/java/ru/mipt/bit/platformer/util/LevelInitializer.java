@@ -38,7 +38,7 @@ public class LevelInitializer {
             JSONArray playerCoord = obj.getJSONArray("player");
             GridPoint2 tankPositions = new GridPoint2(playerCoord.getInt(0), playerCoord.getInt(1));
 
-            level = new Level(tankPositions, treePositions);
+            level = new Level(tankPositions, treePositions, new Array<>());
 
         } catch (Exception e) {
             System.err.println("Error when reading level: " + e.getMessage());
@@ -48,11 +48,7 @@ public class LevelInitializer {
         return level;
     }
 
-    private static boolean CheckCollision(GridPoint2 playerPosition, Array<GridPoint2> treePostions, GridPoint2 newPosition) {
-        if (playerPosition.equals(newPosition)) {
-            return true;
-        }
-
+    private static boolean CheckCollision(Array<GridPoint2> treePostions, GridPoint2 newPosition) {
         for (GridPoint2 treePos : treePostions) {
             if (treePos.equals(newPosition)) {
                 return true;
@@ -62,23 +58,35 @@ public class LevelInitializer {
         return false;
     }
 
-    public static Level generateRandomLevel(int treeNum) {
+    private static Array<GridPoint2> generateGridArray(int num_item) {
         Random random = new Random();
-        IntStream stream = random.ints(0, 10);
+        IntStream stream = random.ints(0, GameConstants.levelWidth * GameConstants.levelHight);
         var it = stream.iterator();
-        GridPoint2 tankPosition = new GridPoint2(it.next(), it.next() % 8);
-        
-        Array<GridPoint2> treePositions = new Array<>();
-        int treeNumGenerated = 0;
-        while (treeNumGenerated < treeNum) {
-            GridPoint2 newTreePosition = new GridPoint2(it.next(), it.next() % 8);
-            if (!CheckCollision(tankPosition, treePositions, newTreePosition)) {
-                treePositions.add(newTreePosition);
-                ++treeNumGenerated;
+
+        Array<GridPoint2> positions = new Array<>();
+        int numGenerated = 0;
+        while (numGenerated < num_item) {
+            GridPoint2 newPosition = new GridPoint2(it.next() % GameConstants.levelWidth, it.next() % GameConstants.levelHight);
+            if (!CheckCollision(positions, newPosition)) {
+                positions.add(newPosition);
+                ++numGenerated;
             }
         }
-        
-        return new Level(tankPosition, treePositions);
+
+        return positions;
+    }
+
+    public static Level generateRandomLevel(int treeNum, int tankNum) {
+        Array<GridPoint2> generatedPositions = generateGridArray(1 + treeNum + tankNum);
+        Array<GridPoint2> treePositions  = new Array<>();
+        for (int i = 0; i < treeNum; i++) {
+            treePositions.add(generatedPositions.get(i + 1));
+        }
+        Array<GridPoint2> aiTanksPositions  = new Array<>();
+        for (int i = 0; i < tankNum; i++) {
+            aiTanksPositions.add(generatedPositions.get(i + 1 + treeNum));
+        }
+        return new Level(generatedPositions.first(), treePositions, aiTanksPositions);
     }
 
     
