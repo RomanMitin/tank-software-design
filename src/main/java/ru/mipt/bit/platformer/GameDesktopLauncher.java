@@ -32,11 +32,12 @@ public class GameDesktopLauncher implements ApplicationListener {
         buttonHandler = new ButtonHandler();
         aiTanksHandler = new AITanksHandler();
 
-        level = LevelInitializer.generateRandomLevel(30, 10);
+        level = LevelInitializer.generateRandomLevel(3, 2);
         // level = LevelInitializer.readLevel();
         level.registerPlayerTankHandlers(buttonHandler);
         level.registerAITanksActions(aiTanksHandler);
         levelDrawable = new LevelDrawable(level, batch);
+        levelDrawable.registerPlayerTankHandlers(buttonHandler);
     }
 
     @Override

@@ -6,6 +6,9 @@ public class GameObj {
     protected GridPoint2 coordinates;
     protected Direction direction;
     protected GameObjType type;
+    protected float heath;
+
+    static public float max_heath = 100;
 
     public GameObj(GameObjType type) {
         this(new GridPoint2(1, 5), Direction.Left, type);
@@ -15,11 +18,11 @@ public class GameObj {
         this(coordinates, direction, GameObjType.Tree);
     }
 
-
     public GameObj(GridPoint2 coordinates, Direction direction, GameObjType type) {
         this.coordinates = coordinates;
         this.direction = direction;
         this.type = type;
+        this.heath = 80;
     }
 
     public GridPoint2 getCoordinates() {
@@ -32,5 +35,9 @@ public class GameObj {
 
     public GameObjType getType() {
         return type;
+    }
+
+    public float getHeath() {
+        return heath;
     }
 }

@@ -1,5 +1,6 @@
 package ru.mipt.bit.platformer.Visualizer;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 
 // import java.util.logging.Level;
@@ -11,10 +12,15 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
+import static com.badlogic.gdx.Input.Keys.*;
 
+import java.util.concurrent.Callable;
+
+import ru.mipt.bit.platformer.GameObjects.Direction;
 import ru.mipt.bit.platformer.GameObjects.GameObj;
 import ru.mipt.bit.platformer.GameObjects.Level;
 import ru.mipt.bit.platformer.GameObjects.MovableObj;
+import ru.mipt.bit.platformer.util.ButtonHandler;
 import ru.mipt.bit.platformer.util.TileMovement;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
@@ -34,14 +40,14 @@ public class LevelDrawable implements Drawable {
                     Texture blueTankTexture = new Texture("images/tank_blue.png");
                     MovableObj tank = (MovableObj) obj;
                     MovableObjDrawable tankDrawable = new MovableObjDrawable(tank, blueTankTexture, tileMovement);
-                    drawableObjects.add((Drawable) tankDrawable);
+                    drawableObjects.add((Drawable) new DrawableHealthDecorator(tankDrawable));
                     moveRectangleAtTileCenter(groundLayer, tankDrawable.getRectangle(), tank.getCoordinates());
                     break;
                 case AITank:
                     Texture aiTankTexture = new Texture("images/tank_blue.png");
                     MovableObj aiTank = (MovableObj) obj;
                     MovableObjDrawable aiTankDrawable = new MovableObjDrawable(aiTank, aiTankTexture, tileMovement);
-                    drawableObjects.add((Drawable) aiTankDrawable);
+                    drawableObjects.add((Drawable) new DrawableHealthDecorator(aiTankDrawable));
                     moveRectangleAtTileCenter(groundLayer, aiTankDrawable.getRectangle(), aiTank.getCoordinates());
                     break;
                 case Tree:
@@ -94,6 +100,18 @@ public class LevelDrawable implements Drawable {
             drawable.dispose();
         }
         tiledMap.dispose();
+    }
+
+    public void registerPlayerTankHandlers(ButtonHandler buttonHandler) {
+        Callable<Integer> ToggleHealthBarHandler = () -> {
+            if (DrawableHealthDecorator.is_ready_for_revert)
+                DrawableHealthDecorator.revert_health_visible = true;
+            System.err.println("hello");
+            return 0;
+        };
+
+
+        buttonHandler.registerButtonHandler(L, ToggleHealthBarHandler);
     }
     
 }
