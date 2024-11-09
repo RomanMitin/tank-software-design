@@ -10,7 +10,7 @@ import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 
 public class MovableObj extends GameObj{
-  static public final float timeBetweenMoves = 0.4f;
+  static public float timeBetweenMoves = 0.4f;
 
   GridPoint2 destinationCoordinates;
   float MovementProgress;
@@ -29,24 +29,29 @@ public class MovableObj extends GameObj{
     return isEqual(MovementProgress, 1f);
   }
 
-  private boolean isCollide(Array<GameObj> obstacleCoordinate, GridPoint2 point) {
+  protected GameObj getCollidedObj(Array<GameObj> obstacleCoordinate, GridPoint2 point) {
+    for (GameObj obj : obstacleCoordinate) {
+      if (obj.getType() != GameObjType.Tree) {
+        MovableObj movableObj = (MovableObj)obj;
+        if (movableObj.destinationCoordinates.equals(point)) {
+          return movableObj;
+        }
+      }
+      if (obj.getCoordinates().equals(point)) {
+        return obj;
+      }
+    }
+
+    return null;
+  }
+
+  protected boolean isCollide(Array<GameObj> obstacleCoordinate, GridPoint2 point) {
     if (point.x >= GameConstants.levelWidth || point.x < 0)
       return true;
     if (point.y >= GameConstants.levelHight || point.y < 0)
       return true;
-    for (GameObj obj : obstacleCoordinate) {
-      if (obj.getType() == GameObjType.PlayerTank || obj.getType() == GameObjType.AITank) {
-        MovableObj movableObj = (MovableObj)obj;
-        if (movableObj.destinationCoordinates.equals(point)) {
-          return true;
-        }
-      }
-      if (obj.getCoordinates().equals(point)) {
-        return true;
-      }
-    }
 
-    return false;
+    return getCollidedObj(obstacleCoordinate, point) != null;
   }
 
   public void move(Array<GameObj> obstacleCoordinates, Direction moveDirection) {

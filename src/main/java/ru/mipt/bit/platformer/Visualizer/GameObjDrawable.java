@@ -29,6 +29,12 @@ public class GameObjDrawable implements Drawable{
     }
 
     @Override
+    public
+    boolean isGameObj(GameObj gameObj) {
+        return this.gameObject == gameObj;
+    };
+
+    @Override
     public void dispose() {
         texture.dispose();
     }

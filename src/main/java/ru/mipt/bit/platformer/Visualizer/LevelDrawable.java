@@ -18,18 +18,21 @@ import java.util.concurrent.Callable;
 
 import ru.mipt.bit.platformer.GameObjects.Direction;
 import ru.mipt.bit.platformer.GameObjects.GameObj;
+import ru.mipt.bit.platformer.GameObjects.GameObjType;
 import ru.mipt.bit.platformer.GameObjects.Level;
 import ru.mipt.bit.platformer.GameObjects.MovableObj;
 import ru.mipt.bit.platformer.util.ButtonHandler;
+import ru.mipt.bit.platformer.util.Listener;
 import ru.mipt.bit.platformer.util.TileMovement;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
-public class LevelDrawable implements Drawable {
+public class LevelDrawable implements Drawable, Listener {
     private Level level;
     private MapRenderer levelRenderer;
     private Array<Drawable> drawableObjects;
     private TiledMap tiledMap;
-
+    TiledMapTileLayer groundLayer;
+    TileMovement tileMovement;
 
     private void InitializeDrawableObjects(Array<GameObj> gameObjects, TileMovement tileMovement, TiledMapTileLayer groundLayer) {
         drawableObjects = new Array<>();
@@ -54,7 +57,7 @@ public class LevelDrawable implements Drawable {
                     GameObj tree = (GameObj) obj;
                     Texture greenTreeTexture = new Texture("images/greenTree.png");
                     GameObjDrawable treeDrawable = new GameObjDrawable(tree, greenTreeTexture);
-                    drawableObjects.add((Drawable) treeDrawable);
+                    drawableObjects.add((Drawable) treeDrawable);                    
                     moveRectangleAtTileCenter(groundLayer, treeDrawable.getRectangle(), tree.getCoordinates());
                     break;
                 default:
@@ -68,14 +71,13 @@ public class LevelDrawable implements Drawable {
 
     public LevelDrawable(Level level, Batch batch) {
         this.level = level;
+        level.eventManager.subscribe(this);
         tiledMap = new TmxMapLoader().load("level.tmx");
         levelRenderer = createSingleLayerMapRenderer(tiledMap, batch);
-        TiledMapTileLayer groundLayer = getSingleLayer(tiledMap);
-        TileMovement tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
-
+        groundLayer = getSingleLayer(tiledMap);
+        tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
 
         InitializeDrawableObjects(level.getGameObjects(), tileMovement, groundLayer);
-
     }
 
     @Override
@@ -106,12 +108,34 @@ public class LevelDrawable implements Drawable {
         Callable<Integer> ToggleHealthBarHandler = () -> {
             if (DrawableHealthDecorator.is_ready_for_revert)
                 DrawableHealthDecorator.revert_health_visible = true;
-            System.err.println("hello");
             return 0;
         };
 
 
         buttonHandler.registerButtonHandler(L, ToggleHealthBarHandler);
     }
-    
+
+    @Override
+    public void update(GameObj gameObj, boolean is_removed) {
+        if (is_removed) {
+            for (Drawable drawable : drawableObjects) {
+                if (drawable.isGameObj(gameObj)) {
+                    drawable.dispose();
+                    drawableObjects.removeValue(drawable, false);
+                    break;
+                }
+            }
+        } else {
+            if (gameObj.getType() == GameObjType.Bullet) {
+                Texture bulletTexture = new Texture("images/bullet.png");
+                MovableObj bullet = (MovableObj) gameObj;
+                MovableObjDrawable bulletDrawable = new MovableObjDrawable(bullet, bulletTexture, tileMovement);
+                drawableObjects.add((Drawable) bulletDrawable);
+                moveRectangleAtTileCenter(groundLayer, bulletDrawable.getRectangle(), bullet.getCoordinates());
+            } else {
+                System.err.println("Unknown Gameobject added");
+            }
+        }
+    }
+
 }

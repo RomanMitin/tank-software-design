@@ -7,7 +7,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import ru.mipt.bit.platformer.util.AITanksHandler;
 import ru.mipt.bit.platformer.util.ButtonHandler;
 import ru.mipt.bit.platformer.util.LevelInitializer;
 import ru.mipt.bit.platformer.Visualizer.LevelDrawable;
@@ -24,18 +23,16 @@ public class GameDesktopLauncher implements ApplicationListener {
     private LevelDrawable levelDrawable;
 
     private ButtonHandler buttonHandler;
-    private AITanksHandler aiTanksHandler;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         buttonHandler = new ButtonHandler();
-        aiTanksHandler = new AITanksHandler();
 
         level = LevelInitializer.generateRandomLevel(3, 2);
         // level = LevelInitializer.readLevel();
+
         level.registerPlayerTankHandlers(buttonHandler);
-        level.registerAITanksActions(aiTanksHandler);
         levelDrawable = new LevelDrawable(level, batch);
         levelDrawable.registerPlayerTankHandlers(buttonHandler);
     }
@@ -50,7 +47,7 @@ public class GameDesktopLauncher implements ApplicationListener {
         float deltaTime = Gdx.graphics.getDeltaTime();
 
         buttonHandler.handleButtonInputs();
-        aiTanksHandler.handleActions();
+        level.gameLogicTick();
 
         levelDrawable.drawTexture(batch, deltaTime);
     }

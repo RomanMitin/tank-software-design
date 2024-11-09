@@ -65,7 +65,6 @@ public class DrawableHealthDecorator extends DrawableDecorator {
     }
 
     private TextureRegion getHealthbarTexture(float relativeHealth) {
-        System.err.println(relativeHealth);
         var pixmap = new Pixmap(90, 20, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.RED);
         pixmap.fillRectangle(0, 0, 90, 20);
