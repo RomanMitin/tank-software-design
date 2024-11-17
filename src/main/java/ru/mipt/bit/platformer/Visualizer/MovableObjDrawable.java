@@ -18,7 +18,6 @@ public class MovableObjDrawable extends GameObjDrawable {
     public void drawTexture(Batch batch, float deltaTime) {
         // calculate interpolated player screen coordinates
         MovableObj movableGameObj = (MovableObj)gameObject;
-        movableGameObj.recalculate_position(deltaTime);
         tileMovement.moveRectangleBetweenTileCenters(rectangle, movableGameObj);
         super.drawTexture(batch, deltaTime);
     }

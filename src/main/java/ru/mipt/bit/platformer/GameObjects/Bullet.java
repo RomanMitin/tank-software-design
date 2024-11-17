@@ -22,7 +22,7 @@ public class Bullet extends MovableObj {
     }
 
     @Override
-    public void recalculate_position(float deltaTime) {
+    public void recalculate_state(float deltaTime) {
         if (!is_collided) {
             GridPoint2 destPoint = new GridPoint2(coordinates);
             destPoint.add(direction.getOffset());
@@ -32,12 +32,12 @@ public class Bullet extends MovableObj {
                 if (collided_obj != null && collided_obj.getType() != GameObjType.Bullet) {
                     is_collided = true;
                     heath = 0;
-                    collided_obj.heath -= bullet_damage;
+                    collided_obj.takeDamage(bullet_damage);
                 }
             }
             destinationCoordinates = destPoint;
             have_destination = true;
-            super.recalculate_position(deltaTime);
+            super.recalculate_state(deltaTime);
         }
     }
 }

@@ -5,6 +5,12 @@ import java.util.concurrent.Callable;
 
 import com.badlogic.gdx.Gdx;
 
+import ru.mipt.bit.platformer.GameObjects.Bullet;
+import ru.mipt.bit.platformer.GameObjects.Direction;
+import ru.mipt.bit.platformer.GameObjects.Level;
+import ru.mipt.bit.platformer.GameObjects.ShootingObj;
+import static com.badlogic.gdx.Input.Keys.*;
+
 public class ButtonHandler {
     java.util.Map<Integer, Callable<Integer>> button2actionMap;
 
@@ -26,10 +32,61 @@ public class ButtonHandler {
                 try {
                     callable.call();    
                 } catch (Exception e) {
-                    System.out.print(e.getMessage());
-                    // System.out.println("EXception occurs in handleButtonInputs");
+                    System.out.println(e.getMessage());
                 }
             }
         }
+    }
+
+    public void registerDefaultPlayerTankHandlers(Level level) {
+        ShootingObj playerTank = level.getPlayerTank();
+
+         Callable<Integer> handlerUp = () -> {
+            if (playerTank != null)
+                playerTank.move(Direction.Up);
+            return 0;
+        };
+
+        Callable<Integer> handlerLeft = () -> {
+            if (playerTank != null)
+                playerTank.move(Direction.Left);
+            return 0;
+        };
+
+        Callable<Integer> handlerDown = () -> {
+            if (playerTank != null)
+                playerTank.move(Direction.Down);
+            return 0;
+        };
+
+        Callable<Integer> handlerRight = () -> {
+            if (playerTank != null)
+                playerTank.move(Direction.Right);
+            return 0;
+        };
+
+        Callable<Integer> handlerShoot = () -> {
+            if (playerTank != null) {
+                Bullet bullet = playerTank.shoot();
+                if (bullet != null) {
+                    level.handle_obj_creation(bullet);
+                }
+            }
+            return 0;
+        };
+
+        registerButtonHandler(UP, handlerUp);
+        registerButtonHandler(W, handlerUp);
+
+        registerButtonHandler(LEFT, handlerLeft);
+        registerButtonHandler(A, handlerLeft);
+
+        registerButtonHandler(DOWN, handlerDown);
+        registerButtonHandler(S, handlerDown);
+
+        registerButtonHandler(RIGHT, handlerRight);
+        registerButtonHandler(D, handlerRight);
+
+        registerButtonHandler(SPACE, handlerShoot);
     }
 }

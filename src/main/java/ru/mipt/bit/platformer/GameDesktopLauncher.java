@@ -35,7 +35,7 @@ public class GameDesktopLauncher implements ApplicationListener {
 
         level = ctx.getBean(Level.class, false);
 
-        level.registerPlayerTankHandlers(buttonHandler);
+        buttonHandler.registerDefaultPlayerTankHandlers(level);
         levelDrawable = ctx.getBean(LevelDrawable.class, level, batch);
         level.notifyAboutAllObjects();
         levelDrawable.registerPlayerTankHandlers(buttonHandler);
@@ -51,7 +51,7 @@ public class GameDesktopLauncher implements ApplicationListener {
         float deltaTime = Gdx.graphics.getDeltaTime();
 
         buttonHandler.handleButtonInputs();
-        level.gameLogicTick();
+        level.gameLogicTick(deltaTime);
 
         levelDrawable.drawTexture(batch, deltaTime);
     }

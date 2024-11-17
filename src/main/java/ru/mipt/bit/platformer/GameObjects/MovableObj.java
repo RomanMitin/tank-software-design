@@ -46,7 +46,7 @@ public class MovableObj extends GameObj{
     }
   }
 
-  public void recalculate_position(float deltaTime) {
+  public void recalculate_state(float deltaTime) {
     if (have_destination) {
       MovementProgress = continueProgress(MovementProgress, deltaTime, timeBetweenMoves);
       if (this.isMoving()) {

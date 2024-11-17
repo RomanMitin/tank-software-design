@@ -22,7 +22,7 @@ public class ShootingObj extends MovableObj {
         return ShootingProgress >= 1f;
     }
 
-    public Bullet shoot(Array<GameObj> obstacleCoordinates) {
+    public Bullet shoot() {
         if (this.isShooting()) {
             ShootingProgress = 0;
             Bullet bullet = new Bullet(collisionHanler, new GridPoint2(destinationCoordinates), direction, GameObjType.Bullet);
@@ -33,9 +33,9 @@ public class ShootingObj extends MovableObj {
     }
 
     @Override
-    public void recalculate_position(float deltaTime) {
+    public void recalculate_state(float deltaTime) {
         ShootingProgress = continueProgress(ShootingProgress, deltaTime, timeBetweenMoves);
-        super.recalculate_position(deltaTime);
+        super.recalculate_state(deltaTime);
     }
     
 }

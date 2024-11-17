@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.GridPoint2;
 public class GameObj {
     protected GridPoint2 coordinates;
     protected Direction direction;
-    protected GameObjType type;
+    final protected GameObjType type;
     protected float heath;
 
     static public float max_heath = 100;
@@ -25,6 +25,8 @@ public class GameObj {
         this.heath = 80;
     }
 
+    public void recalculate_state(float deltaTime) {}
+
     public GridPoint2 getCoordinates() {
         return coordinates;
     }
@@ -39,5 +41,9 @@ public class GameObj {
 
     public float getHeath() {
         return heath;
+    }
+
+    public void takeDamage(float damage) {
+        heath-=damage;
     }
 }

@@ -2,8 +2,6 @@ package ru.mipt.bit.platformer.GameObjects;
 
 import java.util.concurrent.Callable;
 
-import static com.badlogic.gdx.Input.Keys.*;
-
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 
@@ -21,64 +19,14 @@ public class Level {
     CollisionHandler collisionHanler;
     public EventManager eventManager;
 
-    private void handle_obj_creation(GameObj gameObj) {
+    public void handle_obj_creation(GameObj gameObj) {
         gameObjects.add(gameObj);
         eventManager.notify(gameObj, EventType.objCreation);
     }
 
-    private void handle_obj_removal(GameObj gameObj) {
+    public void handle_obj_removal(GameObj gameObj) {
         gameObjects.removeValue(gameObj, false);
         eventManager.notify(gameObj, EventType.objRemoval);
-    }
-
-    public void registerPlayerTankHandlers(ButtonHandler buttonHandler) {
-        Callable<Integer> handlerUp = () -> {
-            if (playerTank != null)
-                playerTank.move(Direction.Up);
-            return 0;
-        };
-
-        Callable<Integer> handlerLeft = () -> {
-            if (playerTank != null)
-                playerTank.move(Direction.Left);
-            return 0;
-        };
-
-        Callable<Integer> handlerDown = () -> {
-            if (playerTank != null)
-                playerTank.move(Direction.Down);
-            return 0;
-        };
-
-        Callable<Integer> handlerRight = () -> {
-            if (playerTank != null)
-                playerTank.move(Direction.Right);
-            return 0;
-        };
-
-        Callable<Integer> handlerShoot = () -> {
-            if (playerTank != null) {
-                Bullet bullet = playerTank.shoot(gameObjects);
-                if (bullet != null) {
-                    handle_obj_creation(bullet);
-                }
-            }
-            return 0;
-        };
-
-        buttonHandler.registerButtonHandler(UP, handlerUp);
-        buttonHandler.registerButtonHandler(W, handlerUp);
-
-        buttonHandler.registerButtonHandler(LEFT, handlerLeft);
-        buttonHandler.registerButtonHandler(A, handlerLeft);
-
-        buttonHandler.registerButtonHandler(DOWN, handlerDown);
-        buttonHandler.registerButtonHandler(S, handlerDown);
-
-        buttonHandler.registerButtonHandler(RIGHT, handlerRight);
-        buttonHandler.registerButtonHandler(D, handlerRight);
-
-        buttonHandler.registerButtonHandler(SPACE, handlerShoot);
     }
 
     public Level() {
@@ -110,12 +58,13 @@ public class Level {
         }
     }
 
-    public void gameLogicTick() {
+    public void gameLogicTick(float deltaTime) {
         aiTanksActions.handleActions();
 
         for (GameObj gameObj : gameObjects) {
-            if (gameObj.heath <= 0) {
-                if (gameObj.type == GameObjType.PlayerTank)
+            gameObj.recalculate_state(deltaTime);
+            if (gameObj.getHeath() <= 0) {
+                if (gameObj.getType() == GameObjType.PlayerTank)
                     playerTank = null;
                 handle_obj_removal(gameObj);
             }
@@ -127,25 +76,15 @@ public class Level {
     }
 
     private void registerAITanksActions() {
-        int tank_number = 101;
         for (GameObj gameObj : gameObjects) {
-            if (gameObj.type == GameObjType.AITank) {
+            if (gameObj.getType() == GameObjType.AITank) {
                 ShootingObj shootingObj = (ShootingObj)gameObj;
-                Callable<Integer> aitankAction = () -> {
-                    long time = System.currentTimeMillis();
-                    if (time % tank_number == 0) {
-                        Bullet bullet = shootingObj.shoot(gameObjects);
-                        if (bullet != null) {
-                            handle_obj_creation(bullet);
-                        }
-                    }
-                    else if (time % tank_number == 53)
-                        shootingObj.move(TankAI.chooseDirection());
-
-                    return 0;
-                };
-                aiTanksActions.registerAction(aitankAction);
+                aiTanksActions.registerAction(TankAI.getDefaultAITankAction(shootingObj, this));
             }
         }
+    }
+
+    public ShootingObj getPlayerTank() {
+        return playerTank;
     }
 }

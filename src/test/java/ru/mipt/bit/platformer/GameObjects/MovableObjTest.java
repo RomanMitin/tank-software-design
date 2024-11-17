@@ -66,19 +66,19 @@ public class MovableObjTest {
 
         // Execution
         obj.move(Direction.Up);
-        obj.recalculate_position(MovableObj.timeBetweenMoves);
+        obj.recalculate_state(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(new GridPoint2(1, 2), obj.getCoordinates());
 
         obj.move(Direction.Right);
-        obj.recalculate_position(MovableObj.timeBetweenMoves);
+        obj.recalculate_state(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(new GridPoint2(2, 2), obj.getCoordinates());
 
         obj.move(Direction.Down);
-        obj.recalculate_position(MovableObj.timeBetweenMoves);
+        obj.recalculate_state(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(new GridPoint2(2, 1), obj.getCoordinates());
 
         obj.move(Direction.Left);
-        obj.recalculate_position(MovableObj.timeBetweenMoves);
+        obj.recalculate_state(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(new GridPoint2(1, 1), obj.getCoordinates());
 
         // Assertion
@@ -99,25 +99,25 @@ public class MovableObjTest {
         Array<GameObj> arrayObjects = new Array<GameObj>();
         arrayObjects.add(new GameObj(new GridPoint2(1, 2), Direction.Down));
         obj.move(Direction.Up);
-        obj.recalculate_position(MovableObj.timeBetweenMoves);
+        obj.recalculate_state(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(expected_coord, obj.getCoordinates());
 
         arrayObjects = new Array<GameObj>();
         arrayObjects.add(new GameObj(new GridPoint2(2, 1), Direction.Down));
         obj.move(Direction.Right);
-        obj.recalculate_position(MovableObj.timeBetweenMoves);
+        obj.recalculate_state(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(expected_coord, obj.getCoordinates());
 
         arrayObjects = new Array<GameObj>();
         arrayObjects.add(new GameObj(new GridPoint2(1, 0), Direction.Down));
         obj.move(Direction.Down);
-        obj.recalculate_position(MovableObj.timeBetweenMoves);
+        obj.recalculate_state(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(expected_coord, obj.getCoordinates());
 
         arrayObjects = new Array<GameObj>();
         arrayObjects.add(new GameObj(new GridPoint2(0, 1), Direction.Down));
         obj.move(Direction.Left);
-        obj.recalculate_position(MovableObj.timeBetweenMoves);
+        obj.recalculate_state(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(expected_coord, obj.getCoordinates());
 
         // Assertion
