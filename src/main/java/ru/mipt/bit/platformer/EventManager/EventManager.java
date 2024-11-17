@@ -1,5 +1,4 @@
-package ru.mipt.bit.platformer.util;
-
+package ru.mipt.bit.platformer.EventManager;
 
 import com.badlogic.gdx.utils.Array;
 
@@ -16,9 +15,9 @@ public class EventManager {
         listeners.removeValue(listener, false);
     }
 
-    public void notify(GameObj gameObj, boolean is_removed) {
+    public void notify(GameObj gameObj, EventType type) {
         for (Listener listener : listeners) {
-            listener.update(gameObj, is_removed);
+            listener.update(gameObj, type);
         }
     }
     

@@ -7,56 +7,61 @@ import static com.badlogic.gdx.Input.Keys.*;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 
+import ru.mipt.bit.platformer.EventManager.EventType;
+import ru.mipt.bit.platformer.EventManager.EventManager;
 import ru.mipt.bit.platformer.util.AITanksHandler;
 import ru.mipt.bit.platformer.util.ButtonHandler;
-import ru.mipt.bit.platformer.util.EventManager;
+import ru.mipt.bit.platformer.util.CollisionHandler;
 import ru.mipt.bit.platformer.util.TankAI;
 
 public class Level {
     private ShootingObj playerTank;
     private Array<GameObj> gameObjects;
     AITanksHandler aiTanksActions;
+    CollisionHandler collisionHanler;
     public EventManager eventManager;
+
+    private void handle_obj_creation(GameObj gameObj) {
+        gameObjects.add(gameObj);
+        eventManager.notify(gameObj, EventType.objCreation);
+    }
+
+    private void handle_obj_removal(GameObj gameObj) {
+        gameObjects.removeValue(gameObj, false);
+        eventManager.notify(gameObj, EventType.objRemoval);
+    }
 
     public void registerPlayerTankHandlers(ButtonHandler buttonHandler) {
         Callable<Integer> handlerUp = () -> {
             if (playerTank != null)
-                playerTank.move(gameObjects, Direction.Up);
+                playerTank.move(Direction.Up);
             return 0;
         };
 
         Callable<Integer> handlerLeft = () -> {
             if (playerTank != null)
-                playerTank.move(gameObjects, Direction.Left);
+                playerTank.move(Direction.Left);
             return 0;
         };
 
         Callable<Integer> handlerDown = () -> {
             if (playerTank != null)
-                playerTank.move(gameObjects, Direction.Down);
+                playerTank.move(Direction.Down);
             return 0;
         };
 
         Callable<Integer> handlerRight = () -> {
             if (playerTank != null)
-                playerTank.move(gameObjects, Direction.Right);
+                playerTank.move(Direction.Right);
             return 0;
         };
 
         Callable<Integer> handlerShoot = () -> {
-            Bullet bullet = playerTank.shoot(gameObjects);
-            if (bullet != null) {
-                gameObjects.add(bullet);
-                eventManager.notify(bullet, false);
-                Callable<Integer> bulletAction = () -> {
-                    bullet.move(gameObjects, null);
-                    if (bullet.is_collided) {
-                        eventManager.notify(bullet, true);
-                        gameObjects.removeValue(bullet, false);
-                    }
-                    return 0;
-                };
-                aiTanksActions.registerAction(bulletAction);
+            if (playerTank != null) {
+                Bullet bullet = playerTank.shoot(gameObjects);
+                if (bullet != null) {
+                    handle_obj_creation(bullet);
+                }
             }
             return 0;
         };
@@ -84,8 +89,9 @@ public class Level {
         gameObjects = new Array<>();
         eventManager = new EventManager();
         aiTanksActions = new AITanksHandler();
+        collisionHanler = new CollisionHandler(eventManager);
 
-        playerTank = new ShootingObj(playerTankPosition, Direction.Left, GameObjType.PlayerTank);
+        playerTank = new ShootingObj(collisionHanler, playerTankPosition, Direction.Left, GameObjType.PlayerTank);
         gameObjects.add(playerTank);
         
         for(GridPoint2 coord : treePositions) {
@@ -93,24 +99,27 @@ public class Level {
         }
         
         for(GridPoint2 coord : aiTanksPostions) {
-            gameObjects.add(new ShootingObj(coord, Direction.Right, GameObjType.AITank));
+            gameObjects.add(new ShootingObj(collisionHanler, coord, Direction.Right, GameObjType.AITank));
         }
         registerAITanksActions();
+    }
+
+    public void notifyAboutAllObjects() {
+        for (GameObj obj : gameObjects) {
+            eventManager.notify(obj, EventType.objCreation);
+        }
     }
 
     public void gameLogicTick() {
         aiTanksActions.handleActions();
 
-        Array<GameObj> val_to_remove = new Array<>();
         for (GameObj gameObj : gameObjects) {
             if (gameObj.heath <= 0) {
                 if (gameObj.type == GameObjType.PlayerTank)
                     playerTank = null;
-                val_to_remove.add(gameObj);
-                eventManager.notify(gameObj, true);
+                handle_obj_removal(gameObj);
             }
         }
-        gameObjects.removeAll(val_to_remove, false);
     }
 
     public Array<GameObj> getGameObjects() {
@@ -124,25 +133,14 @@ public class Level {
                 ShootingObj shootingObj = (ShootingObj)gameObj;
                 Callable<Integer> aitankAction = () -> {
                     long time = System.currentTimeMillis();
-                    System.err.println(time % tank_number);
                     if (time % tank_number == 0) {
                         Bullet bullet = shootingObj.shoot(gameObjects);
                         if (bullet != null) {
-                            gameObjects.add(bullet);
-                            eventManager.notify(bullet, false);
-                            Callable<Integer> bulletAction = () -> {
-                                bullet.move(gameObjects, null);
-                                if (bullet.is_collided) {
-                                    eventManager.notify(bullet, true);
-                                    gameObjects.removeValue(bullet, false);
-                                }
-                                return 0;
-                            };
-                            aiTanksActions.registerAction(bulletAction);
+                            handle_obj_creation(bullet);
                         }
                     }
                     else if (time % tank_number == 53)
-                        shootingObj.move(gameObjects, TankAI.chooseDirection());
+                        shootingObj.move(TankAI.chooseDirection());
 
                     return 0;
                 };

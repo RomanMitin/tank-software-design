@@ -8,14 +8,18 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import ru.mipt.bit.platformer.util.ButtonHandler;
-import ru.mipt.bit.platformer.util.LevelInitializer;
 import ru.mipt.bit.platformer.Visualizer.LevelDrawable;
+import ru.mipt.bit.platformer.Configuration.MyApplicationContextConfiguration;
 import ru.mipt.bit.platformer.GameObjects.Level;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
 
 public class GameDesktopLauncher implements ApplicationListener {
+    static ApplicationContext ctx;
 
     private Batch batch;
 
@@ -29,11 +33,11 @@ public class GameDesktopLauncher implements ApplicationListener {
         batch = new SpriteBatch();
         buttonHandler = new ButtonHandler();
 
-        level = LevelInitializer.generateRandomLevel(3, 2);
-        // level = LevelInitializer.readLevel();
+        level = ctx.getBean(Level.class, false);
 
         level.registerPlayerTankHandlers(buttonHandler);
-        levelDrawable = new LevelDrawable(level, batch);
+        levelDrawable = ctx.getBean(LevelDrawable.class, level, batch);
+        level.notifyAboutAllObjects();
         levelDrawable.registerPlayerTankHandlers(buttonHandler);
     }
 
@@ -75,6 +79,7 @@ public class GameDesktopLauncher implements ApplicationListener {
     }
 
     public static void main(String[] args) {
+        ctx = new AnnotationConfigApplicationContext(MyApplicationContextConfiguration.class);
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
         // level width: 10 tiles x 128px, height: 8 tiles x 128px
         config.setWindowedMode(1280, 1024);

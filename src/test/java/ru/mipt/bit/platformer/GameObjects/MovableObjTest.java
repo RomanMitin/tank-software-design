@@ -5,14 +5,18 @@ import org.junit.jupiter.api.Test;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 
+import ru.mipt.bit.platformer.EventManager.EventManager;
+import ru.mipt.bit.platformer.util.CollisionHandler;
+
 import org.junit.jupiter.api.Assertions;
 
 public class MovableObjTest {
-
     @Test
     public void defaultCtorTest() {
         // Setup
-        MovableObj obj = new MovableObj();
+        EventManager eventManager = new EventManager();
+        CollisionHandler collisionHanler = new CollisionHandler(eventManager);
+        MovableObj obj = new MovableObj(collisionHanler);
 
         // Execution
         Direction dir = obj.getDirection();
@@ -31,9 +35,11 @@ public class MovableObjTest {
     @Test
     public void ParamCtorTestCtorTest() {
         // Setup
+        EventManager eventManager = new EventManager();
+        CollisionHandler collisionHanler = new CollisionHandler(eventManager);
         Direction expected_dir = Direction.Up;
         GridPoint2 expected_coord = new GridPoint2(1, 3);
-        MovableObj obj = new MovableObj(expected_coord, expected_dir, GameObjType.PlayerTank);
+        MovableObj obj = new MovableObj(collisionHanler, expected_coord, expected_dir, GameObjType.PlayerTank);
 
         // Execution
         Direction dir = obj.getDirection();
@@ -52,24 +58,26 @@ public class MovableObjTest {
     @Test
     public void MoveWithoutObstacles() {
         // Setup
+        EventManager eventManager = new EventManager();
+        CollisionHandler collisionHanler = new CollisionHandler(eventManager);
         Direction expected_dir = Direction.Up;
         GridPoint2 expected_coord = new GridPoint2(1, 1);
-        MovableObj obj = new MovableObj(expected_coord, expected_dir, GameObjType.PlayerTank);
+        MovableObj obj = new MovableObj(collisionHanler, expected_coord, expected_dir, GameObjType.PlayerTank);
 
         // Execution
-        obj.move(new Array<>(), Direction.Up);
+        obj.move(Direction.Up);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(new GridPoint2(1, 2), obj.getCoordinates());
 
-        obj.move(new Array<>(), Direction.Right);
+        obj.move(Direction.Right);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(new GridPoint2(2, 2), obj.getCoordinates());
 
-        obj.move(new Array<>(), Direction.Down);
+        obj.move(Direction.Down);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(new GridPoint2(2, 1), obj.getCoordinates());
 
-        obj.move(new Array<>(), Direction.Left);
+        obj.move(Direction.Left);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(new GridPoint2(1, 1), obj.getCoordinates());
 
@@ -81,32 +89,34 @@ public class MovableObjTest {
     @Test
     public void MoveWithObstacles() {
         // Setup
+        EventManager eventManager = new EventManager();
+        CollisionHandler collisionHanler = new CollisionHandler(eventManager);
         Direction expected_dir = Direction.Up;
         GridPoint2 expected_coord = new GridPoint2(1, 1);
-        MovableObj obj = new MovableObj(expected_coord, expected_dir, GameObjType.PlayerTank);
+        MovableObj obj = new MovableObj(collisionHanler, expected_coord, expected_dir, GameObjType.PlayerTank);
 
         // Execution
         Array<GameObj> arrayObjects = new Array<GameObj>();
         arrayObjects.add(new GameObj(new GridPoint2(1, 2), Direction.Down));
-        obj.move(arrayObjects, Direction.Up);
+        obj.move(Direction.Up);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(expected_coord, obj.getCoordinates());
 
         arrayObjects = new Array<GameObj>();
         arrayObjects.add(new GameObj(new GridPoint2(2, 1), Direction.Down));
-        obj.move(arrayObjects, Direction.Right);
+        obj.move(Direction.Right);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(expected_coord, obj.getCoordinates());
 
         arrayObjects = new Array<GameObj>();
         arrayObjects.add(new GameObj(new GridPoint2(1, 0), Direction.Down));
-        obj.move(arrayObjects, Direction.Down);
+        obj.move(Direction.Down);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(expected_coord, obj.getCoordinates());
 
         arrayObjects = new Array<GameObj>();
         arrayObjects.add(new GameObj(new GridPoint2(0, 1), Direction.Down));
-        obj.move(arrayObjects, Direction.Left);
+        obj.move(Direction.Left);
         obj.recalculate_position(MovableObj.timeBetweenMoves);
         Assertions.assertEquals(expected_coord, obj.getCoordinates());
 

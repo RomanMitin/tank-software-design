@@ -3,33 +3,41 @@ package ru.mipt.bit.platformer.GameObjects;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 
+import ru.mipt.bit.platformer.util.CollisionHandler;
+
 public class Bullet extends MovableObj {
     public boolean is_collided = false;
     static final public float bullet_damage = 20;
     
-    public Bullet() {
-        super();
+    public Bullet(CollisionHandler collisionHanler) {
+        super(collisionHanler);
     }
     
-    public Bullet(GridPoint2 Coordinates, Direction direction, GameObjType type) {
-        super(Coordinates, direction, type);
+    public Bullet(CollisionHandler collisionHanler, GridPoint2 Coordinates, Direction direction, GameObjType type) {
+        super(collisionHanler, Coordinates, direction, type);
     }
 
     @Override
-    public void move(Array<GameObj> obstacleCoordinates, Direction moveDirection) {
-        if (this.isMoving() && !is_collided) {
+    public void move(Direction moveDirection) {
+    }
+
+    @Override
+    public void recalculate_position(float deltaTime) {
+        if (!is_collided) {
             GridPoint2 destPoint = new GridPoint2(coordinates);
             destPoint.add(direction.getOffset());
 
-            if (isCollide(obstacleCoordinates, destPoint)) {
-                GameObj collided_obj = getCollidedObj(obstacleCoordinates, destPoint);
+            if (collisionHanler.isCollide(destPoint)) {
+                GameObj collided_obj = collisionHanler.getCollidedObj(destPoint);
                 if (collided_obj != null && collided_obj.getType() != GameObjType.Bullet) {
                     is_collided = true;
+                    heath = 0;
                     collided_obj.heath -= bullet_damage;
                 }
             }
             destinationCoordinates = destPoint;
-            MovementProgress = 0f;
+            have_destination = true;
+            super.recalculate_position(deltaTime);
         }
     }
 }

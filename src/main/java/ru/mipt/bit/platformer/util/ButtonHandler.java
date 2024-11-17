@@ -26,7 +26,8 @@ public class ButtonHandler {
                 try {
                     callable.call();    
                 } catch (Exception e) {
-                    System.out.println("EXception occurs in handleButtonInputs");
+                    System.out.print(e.getMessage());
+                    // System.out.println("EXception occurs in handleButtonInputs");
                 }
             }
         }

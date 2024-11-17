@@ -1,45 +1,32 @@
 package ru.mipt.bit.platformer.GameObjects;
 
+import static ru.mipt.bit.platformer.Visualizer.GdxGameUtils.*;
+
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 
-import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
+import ru.mipt.bit.platformer.util.CollisionHandler;
 
 public class ShootingObj extends MovableObj {
     float ShootingProgress;
 
-    public ShootingObj() {
-        super();
+    public ShootingObj(CollisionHandler collisionHanler) {
+        super(collisionHanler);
     }
 
-    public ShootingObj(GridPoint2 Coordinates, Direction direction, GameObjType type) {
-        super(Coordinates, direction, type);
+    public ShootingObj(CollisionHandler collisionHanler, GridPoint2 Coordinates, Direction direction, GameObjType type) {
+        super(collisionHanler, Coordinates, direction, type);
     }
 
     public boolean isShooting() {
-        return ShootingProgress >= 0.3f;
+        return ShootingProgress >= 1f;
     }
 
     public Bullet shoot(Array<GameObj> obstacleCoordinates) {
         if (this.isShooting()) {
             ShootingProgress = 0;
-            GridPoint2 destPoint = new GridPoint2(coordinates);
-            destPoint.add(direction.getOffset());
-
-            if (!isCollide(obstacleCoordinates, destPoint)) {
-                Bullet bullet = new Bullet(destPoint, direction, GameObjType.Bullet);
-                return bullet;
-            } else {
-                GameObj collided_obj = getCollidedObj(obstacleCoordinates, destPoint);
-                if (collided_obj != null) {
-                    if (!collided_obj.equals(this)) {
-                        collided_obj.heath -= Bullet.bullet_damage;
-                    } else {
-                        Bullet bullet = new Bullet(destPoint, direction, GameObjType.Bullet);
-                        return bullet;
-                    }
-                }
-            }
+            Bullet bullet = new Bullet(collisionHanler, new GridPoint2(destinationCoordinates), direction, GameObjType.Bullet);
+            return bullet;
         }
 
         return null;

@@ -2,6 +2,9 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
     id 'application'
+    id 'org.springframework.boot' version '2.5.4' // Replace with the desired version
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    // id 'org.springframework.boot' version '3.3.2'
 }
 
 apply from: 'versions.gradle'
@@ -33,4 +36,19 @@ dependencies {
 
 dependencies {
    implementation group: 'org.json', name: 'json', version: '20141113'
+}
+
+dependencies {
+     implementation 'org.springframework.boot:spring-boot-starter'
+    // Add other Spring dependencies as needed
+    // For example:
+    // implementation 'org.springframework:spring-context'
+    // implementation 'org.springframework:spring-web'
+    
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // implementation 'org.springframework.boot:spring-boot-starter-web'
+    // developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    // testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

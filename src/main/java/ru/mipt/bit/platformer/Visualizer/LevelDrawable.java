@@ -13,18 +13,20 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import static com.badlogic.gdx.Input.Keys.*;
+import static ru.mipt.bit.platformer.Visualizer.GdxGameUtils.*;
 
 import java.util.concurrent.Callable;
 
+
+import ru.mipt.bit.platformer.EventManager.Listener;
+import ru.mipt.bit.platformer.EventManager.EventType;
 import ru.mipt.bit.platformer.GameObjects.Direction;
 import ru.mipt.bit.platformer.GameObjects.GameObj;
 import ru.mipt.bit.platformer.GameObjects.GameObjType;
 import ru.mipt.bit.platformer.GameObjects.Level;
 import ru.mipt.bit.platformer.GameObjects.MovableObj;
 import ru.mipt.bit.platformer.util.ButtonHandler;
-import ru.mipt.bit.platformer.util.Listener;
 import ru.mipt.bit.platformer.util.TileMovement;
-import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
 public class LevelDrawable implements Drawable, Listener {
     private Level level;
@@ -35,38 +37,9 @@ public class LevelDrawable implements Drawable, Listener {
     TileMovement tileMovement;
 
     private void InitializeDrawableObjects(Array<GameObj> gameObjects, TileMovement tileMovement, TiledMapTileLayer groundLayer) {
-        drawableObjects = new Array<>();
-
         for(GameObj obj : gameObjects) {
-            switch (obj.getType()) {
-                case PlayerTank:
-                    Texture blueTankTexture = new Texture("images/tank_blue.png");
-                    MovableObj tank = (MovableObj) obj;
-                    MovableObjDrawable tankDrawable = new MovableObjDrawable(tank, blueTankTexture, tileMovement);
-                    drawableObjects.add((Drawable) new DrawableHealthDecorator(tankDrawable));
-                    moveRectangleAtTileCenter(groundLayer, tankDrawable.getRectangle(), tank.getCoordinates());
-                    break;
-                case AITank:
-                    Texture aiTankTexture = new Texture("images/tank_blue.png");
-                    MovableObj aiTank = (MovableObj) obj;
-                    MovableObjDrawable aiTankDrawable = new MovableObjDrawable(aiTank, aiTankTexture, tileMovement);
-                    drawableObjects.add((Drawable) new DrawableHealthDecorator(aiTankDrawable));
-                    moveRectangleAtTileCenter(groundLayer, aiTankDrawable.getRectangle(), aiTank.getCoordinates());
-                    break;
-                case Tree:
-                    GameObj tree = (GameObj) obj;
-                    Texture greenTreeTexture = new Texture("images/greenTree.png");
-                    GameObjDrawable treeDrawable = new GameObjDrawable(tree, greenTreeTexture);
-                    drawableObjects.add((Drawable) treeDrawable);                    
-                    moveRectangleAtTileCenter(groundLayer, treeDrawable.getRectangle(), tree.getCoordinates());
-                    break;
-                default:
-                    System.err.println("Unknown object type");
-                    break;
-            }
+            handle_obj_creation(obj);
         }
-
-
     }
 
     public LevelDrawable(Level level, Batch batch) {
@@ -76,8 +49,9 @@ public class LevelDrawable implements Drawable, Listener {
         levelRenderer = createSingleLayerMapRenderer(tiledMap, batch);
         groundLayer = getSingleLayer(tiledMap);
         tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
+        drawableObjects = new Array<>();
 
-        InitializeDrawableObjects(level.getGameObjects(), tileMovement, groundLayer);
+        // InitializeDrawableObjects(level.getGameObjects(), tileMovement, groundLayer);
     }
 
     @Override
@@ -115,9 +89,49 @@ public class LevelDrawable implements Drawable, Listener {
         buttonHandler.registerButtonHandler(L, ToggleHealthBarHandler);
     }
 
+    private void handle_obj_creation(GameObj obj) {
+        switch (obj.getType()) {
+            case PlayerTank:
+                Texture blueTankTexture = new Texture("images/tank_blue.png");
+                MovableObj tank = (MovableObj) obj;
+                MovableObjDrawable tankDrawable = new MovableObjDrawable(tank, blueTankTexture, tileMovement);
+                drawableObjects.add((Drawable) new DrawableHealthDecorator(tankDrawable));
+                moveRectangleAtTileCenter(groundLayer, tankDrawable.getRectangle(), tank.getCoordinates());
+                break;
+            case AITank:
+                Texture aiTankTexture = new Texture("images/tank_blue.png");
+                MovableObj aiTank = (MovableObj) obj;
+                MovableObjDrawable aiTankDrawable = new MovableObjDrawable(aiTank, aiTankTexture, tileMovement);
+                drawableObjects.add((Drawable) new DrawableHealthDecorator(aiTankDrawable));
+                moveRectangleAtTileCenter(groundLayer, aiTankDrawable.getRectangle(), aiTank.getCoordinates());
+                break;
+            case Tree:
+                GameObj tree = (GameObj) obj;
+                Texture greenTreeTexture = new Texture("images/greenTree.png");
+                GameObjDrawable treeDrawable = new GameObjDrawable(tree, greenTreeTexture);
+                drawableObjects.add((Drawable) treeDrawable);                    
+                moveRectangleAtTileCenter(groundLayer, treeDrawable.getRectangle(), tree.getCoordinates());
+                break;
+            case Bullet:
+                Texture bulletTexture = new Texture("images/bullet.png");
+                MovableObj bullet = (MovableObj) obj;
+                MovableObjDrawable bulletDrawable = new MovableObjDrawable(bullet, bulletTexture, tileMovement);
+                drawableObjects.add((Drawable) bulletDrawable);
+                moveRectangleAtTileCenter(groundLayer, bulletDrawable.getRectangle(), bullet.getCoordinates());
+                break;
+            default:
+                System.err.println("Unknown object type");
+                break;
+        }
+    }
+
     @Override
-    public void update(GameObj gameObj, boolean is_removed) {
-        if (is_removed) {
+    public void update(GameObj gameObj, EventType type) {
+        switch (type) {
+            case objCreation:
+                handle_obj_creation(gameObj);
+                break;
+            case objRemoval:
             for (Drawable drawable : drawableObjects) {
                 if (drawable.isGameObj(gameObj)) {
                     drawable.dispose();
@@ -125,16 +139,10 @@ public class LevelDrawable implements Drawable, Listener {
                     break;
                 }
             }
-        } else {
-            if (gameObj.getType() == GameObjType.Bullet) {
-                Texture bulletTexture = new Texture("images/bullet.png");
-                MovableObj bullet = (MovableObj) gameObj;
-                MovableObjDrawable bulletDrawable = new MovableObjDrawable(bullet, bulletTexture, tileMovement);
-                drawableObjects.add((Drawable) bulletDrawable);
-                moveRectangleAtTileCenter(groundLayer, bulletDrawable.getRectangle(), bullet.getCoordinates());
-            } else {
-                System.err.println("Unknown Gameobject added");
-            }
+            break;
+            default:
+                System.err.println("Unknown Event Type");
+                break;
         }
     }
 

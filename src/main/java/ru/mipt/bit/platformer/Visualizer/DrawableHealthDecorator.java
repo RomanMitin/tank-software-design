@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.Rectangle;
 
 import ru.mipt.bit.platformer.GameObjects.Direction;
 import ru.mipt.bit.platformer.GameObjects.GameObj;
-import ru.mipt.bit.platformer.util.GdxGameUtils;
 
 /**
  * DrawableHealthDecorator

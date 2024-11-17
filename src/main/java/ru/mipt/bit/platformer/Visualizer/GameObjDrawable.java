@@ -1,14 +1,14 @@
 package ru.mipt.bit.platformer.Visualizer;
 
+import static ru.mipt.bit.platformer.Visualizer.GdxGameUtils.createBoundingRectangle;
+import static ru.mipt.bit.platformer.Visualizer.GdxGameUtils.drawTextureRegionUnscaled;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
 import ru.mipt.bit.platformer.GameObjects.GameObj;
-
-import static ru.mipt.bit.platformer.util.GdxGameUtils.createBoundingRectangle;
-import static ru.mipt.bit.platformer.util.GdxGameUtils.drawTextureRegionUnscaled;
 
 public class GameObjDrawable implements Drawable{
     protected GameObj gameObject;
