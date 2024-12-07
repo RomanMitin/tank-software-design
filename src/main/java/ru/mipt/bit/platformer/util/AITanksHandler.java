@@ -3,6 +3,9 @@ package ru.mipt.bit.platformer.util;
 import com.badlogic.gdx.utils.Array;
 import java.util.concurrent.Callable;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class AITanksHandler {
     private Array<Callable<Integer>> aiTanksActions = new Array<>();
 

@@ -3,6 +3,9 @@ package ru.mipt.bit.platformer.util;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.badlogic.gdx.Gdx;
 
 import ru.mipt.bit.platformer.GameObjects.Bullet;
@@ -11,9 +14,11 @@ import ru.mipt.bit.platformer.GameObjects.Level;
 import ru.mipt.bit.platformer.GameObjects.ShootingObj;
 import static com.badlogic.gdx.Input.Keys.*;
 
+@Component
 public class ButtonHandler {
     java.util.Map<Integer, Callable<Integer>> button2actionMap;
 
+    @Autowired
     public ButtonHandler() {
         button2actionMap = new HashMap<Integer,Callable<Integer>>();
     }

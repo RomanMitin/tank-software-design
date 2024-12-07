@@ -17,7 +17,6 @@ import static ru.mipt.bit.platformer.Visualizer.GdxGameUtils.*;
 
 import java.util.concurrent.Callable;
 
-
 import ru.mipt.bit.platformer.EventManager.Listener;
 import ru.mipt.bit.platformer.EventManager.EventType;
 import ru.mipt.bit.platformer.GameObjects.Direction;
@@ -36,12 +35,6 @@ public class LevelDrawable implements Drawable, Listener {
     TiledMapTileLayer groundLayer;
     TileMovement tileMovement;
 
-    private void InitializeDrawableObjects(Array<GameObj> gameObjects, TileMovement tileMovement, TiledMapTileLayer groundLayer) {
-        for(GameObj obj : gameObjects) {
-            handle_obj_creation(obj);
-        }
-    }
-
     public LevelDrawable(Level level, Batch batch) {
         this.level = level;
         level.eventManager.subscribe(this);
@@ -50,8 +43,6 @@ public class LevelDrawable implements Drawable, Listener {
         groundLayer = getSingleLayer(tiledMap);
         tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
         drawableObjects = new Array<>();
-
-        // InitializeDrawableObjects(level.getGameObjects(), tileMovement, groundLayer);
     }
 
     @Override

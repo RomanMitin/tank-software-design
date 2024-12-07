@@ -1,4 +1,4 @@
-package ru.mipt.bit.platformer.Configuration;
+package ru.mipt.bit.platformer;
 
 import ru.mipt.bit.platformer.GameObjects.Level;
 
@@ -15,8 +15,8 @@ import ru.mipt.bit.platformer.Visualizer.LevelDrawable;
 
 
 @Configuration
-@ComponentScan  // (1)
-public class MyApplicationContextConfiguration {  // (1)
+@ComponentScan 
+public class MyApplicationContextConfiguration { 
 
     @Bean
     @Scope("prototype")
