@@ -24,7 +24,7 @@ import ru.mipt.bit.platformer.GameObjects.GameObj;
 import ru.mipt.bit.platformer.GameObjects.GameObjType;
 import ru.mipt.bit.platformer.GameObjects.Level;
 import ru.mipt.bit.platformer.GameObjects.MovableObj;
-import ru.mipt.bit.platformer.util.ButtonHandler;
+import ru.mipt.bit.platformer.InputsHandlers.ButtonHandler;
 import ru.mipt.bit.platformer.util.TileMovement;
 
 public class LevelDrawable implements Drawable, Listener {
@@ -67,17 +67,6 @@ public class LevelDrawable implements Drawable, Listener {
             drawable.dispose();
         }
         tiledMap.dispose();
-    }
-
-    public void registerPlayerTankHandlers(ButtonHandler buttonHandler) {
-        Callable<Integer> ToggleHealthBarHandler = () -> {
-            if (DrawableHealthDecorator.is_ready_for_revert)
-                DrawableHealthDecorator.revert_health_visible = true;
-            return 0;
-        };
-
-
-        buttonHandler.registerButtonHandler(L, ToggleHealthBarHandler);
     }
 
     private void handle_obj_creation(GameObj obj) {

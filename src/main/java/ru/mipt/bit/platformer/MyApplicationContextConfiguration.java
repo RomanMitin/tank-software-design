@@ -7,9 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
-import ru.mipt.bit.platformer.GameObjects.ShootingObj;
-import ru.mipt.bit.platformer.util.CollisionHandler;
-import ru.mipt.bit.platformer.util.LevelInitializer;
+import ru.mipt.bit.platformer.LevelGenerationStrategy.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import ru.mipt.bit.platformer.Visualizer.LevelDrawable;
 
@@ -21,11 +19,15 @@ public class MyApplicationContextConfiguration {
     @Bean
     @Scope("prototype")
     public Level Level(boolean read_level) {
+        var ctx = new ru.mipt.bit.platformer.LevelGenerationStrategy.Context();
+
         if (read_level) {
-            return LevelInitializer.readLevel();
+            ctx.setStrategy(new LevelReader());
         } else {
-            return LevelInitializer.generateRandomLevel(5, 5);
+            ctx.setStrategy(new RandomLevelGenerator(5, 5));
         }
+
+        return ctx.generateLevel();
     }
 
     @Bean

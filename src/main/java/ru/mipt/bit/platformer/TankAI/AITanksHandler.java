@@ -1,4 +1,4 @@
-package ru.mipt.bit.platformer.util;
+package ru.mipt.bit.platformer.TankAI;
 
 import com.badlogic.gdx.utils.Array;
 import java.util.concurrent.Callable;

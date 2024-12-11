@@ -7,9 +7,11 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import ru.mipt.bit.platformer.util.ButtonHandler;
 import ru.mipt.bit.platformer.Visualizer.LevelDrawable;
 import ru.mipt.bit.platformer.GameObjects.Level;
+import ru.mipt.bit.platformer.InputsHandlers.ButtonHandler;
+import ru.mipt.bit.platformer.InputsHandlers.KeyboardHandlerRegister;
+import ru.mipt.bit.platformer.TankAI.AITanksHandler;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 
@@ -29,6 +31,8 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     @Autowired
     private ButtonHandler buttonHandler;
+    @Autowired
+    private AITanksHandler aiTanksActions;
 
     @Override
     public void create() {
@@ -36,10 +40,10 @@ public class GameDesktopLauncher implements ApplicationListener {
         
         level = ctx.getBean(Level.class, false);
 
-        buttonHandler.registerDefaultPlayerTankHandlers(level);
+        KeyboardHandlerRegister.registerHandlerForInput(level, buttonHandler);
+        ru.mipt.bit.platformer.TankAI.HandlerRegister.registerAITanksActions(level, aiTanksActions);
         levelDrawable = ctx.getBean(LevelDrawable.class, level, batch);
         level.notifyAboutAllObjects();
-        levelDrawable.registerPlayerTankHandlers(buttonHandler);
     }
 
     @Override
@@ -52,6 +56,7 @@ public class GameDesktopLauncher implements ApplicationListener {
         float deltaTime = Gdx.graphics.getDeltaTime();
 
         buttonHandler.handleButtonInputs();
+        aiTanksActions.handleActions();
         level.gameLogicTick(deltaTime);
 
         levelDrawable.drawTexture(batch, deltaTime);

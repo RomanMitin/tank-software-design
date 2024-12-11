@@ -1,4 +1,4 @@
-package ru.mipt.bit.platformer.util;
+package ru.mipt.bit.platformer.TankAI;
 
 import java.util.Random;
 import java.util.concurrent.Callable;
@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
 import ru.mipt.bit.platformer.GameObjects.Bullet;
 import ru.mipt.bit.platformer.GameObjects.Direction;
 import ru.mipt.bit.platformer.GameObjects.Level;
-import ru.mipt.bit.platformer.GameObjects.ShootingObj;
+import ru.mipt.bit.platformer.GameObjects.ShootingTank;
 
 
 public class TankAI {
@@ -17,7 +17,7 @@ public class TankAI {
         return Direction.values()[x];
     }
 
-    public static Callable<Integer> getDefaultAITankAction(ShootingObj shootingObj, Level level) {
+    public static Callable<Integer> getDefaultAITankAction(ShootingTank shootingObj, Level level) {
         final int numbers_of_ticks = 100;
         return () -> {
             if (shootingObj != null) {

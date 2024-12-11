@@ -3,22 +3,21 @@ package ru.mipt.bit.platformer.GameObjects;
 import static ru.mipt.bit.platformer.Visualizer.GdxGameUtils.*;
 
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.utils.Array;
 
 import ru.mipt.bit.platformer.util.CollisionHandler;
 
-public class ShootingObj extends MovableObj {
+public class ShootingTank extends MovableObj implements IShootingObj {
     float ShootingProgress;
 
-    public ShootingObj(CollisionHandler collisionHanler) {
+    public ShootingTank(CollisionHandler collisionHanler) {
         super(collisionHanler);
     }
 
-    public ShootingObj(CollisionHandler collisionHanler, GridPoint2 Coordinates, Direction direction, GameObjType type) {
+    public ShootingTank(CollisionHandler collisionHanler, GridPoint2 Coordinates, Direction direction, GameObjType type) {
         super(collisionHanler, Coordinates, direction, type);
     }
 
-    public boolean isShooting() {
+    private boolean isShooting() {
         return ShootingProgress >= 1f;
     }
 

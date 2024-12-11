@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import ru.mipt.bit.platformer.GameObjects.GameObj;
 import ru.mipt.bit.platformer.GameObjects.GameObjType;
 import ru.mipt.bit.platformer.GameObjects.Level;
+import ru.mipt.bit.platformer.LevelGenerationStrategy.RandomLevelGenerator;
 
 import org.junit.jupiter.api.Assertions;
 
@@ -15,7 +16,7 @@ public class LevelInitinalizerTest {
     @Test
     public void emptyLevelTest() {        
         // Execution
-        Level level = LevelInitializer.generateRandomLevel(0, 0);
+        Level level = (new RandomLevelGenerator(0, 0)).generateLevel();
         Array<GameObj> gameObjects = level.getGameObjects();
 
         // Assertion
@@ -28,7 +29,7 @@ public class LevelInitinalizerTest {
     @Test
     public void SimpleLevelTest() {        
         // Execution
-        Level level = LevelInitializer.generateRandomLevel(5, 2);
+        Level level = (new RandomLevelGenerator(5, 2)).generateLevel();
         Array<GameObj> gameObjects = level.getGameObjects();
 
         // Assertion

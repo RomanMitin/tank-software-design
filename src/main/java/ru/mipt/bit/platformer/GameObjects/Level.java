@@ -6,16 +6,15 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 
 import ru.mipt.bit.platformer.EventManager.EventType;
+import ru.mipt.bit.platformer.InputsHandlers.ButtonHandler;
+import ru.mipt.bit.platformer.TankAI.AITanksHandler;
+import ru.mipt.bit.platformer.TankAI.TankAI;
 import ru.mipt.bit.platformer.EventManager.EventManager;
-import ru.mipt.bit.platformer.util.AITanksHandler;
-import ru.mipt.bit.platformer.util.ButtonHandler;
 import ru.mipt.bit.platformer.util.CollisionHandler;
-import ru.mipt.bit.platformer.util.TankAI;
 
 public class Level {
-    private ShootingObj playerTank;
+    private ShootingTank playerTank;
     private Array<GameObj> gameObjects;
-    AITanksHandler aiTanksActions;
     CollisionHandler collisionHanler;
     public EventManager eventManager;
 
@@ -36,10 +35,9 @@ public class Level {
     public Level(GridPoint2 playerTankPosition, Array<GridPoint2> treePositions, Array<GridPoint2> aiTanksPostions) {
         gameObjects = new Array<>();
         eventManager = new EventManager();
-        aiTanksActions = new AITanksHandler();
         collisionHanler = new CollisionHandler(eventManager);
 
-        playerTank = new ShootingObj(collisionHanler, playerTankPosition, Direction.Left, GameObjType.PlayerTank);
+        playerTank = new ShootingTank(collisionHanler, playerTankPosition, Direction.Left, GameObjType.PlayerTank);
         gameObjects.add(playerTank);
         
         for(GridPoint2 coord : treePositions) {
@@ -47,9 +45,8 @@ public class Level {
         }
         
         for(GridPoint2 coord : aiTanksPostions) {
-            gameObjects.add(new ShootingObj(collisionHanler, coord, Direction.Right, GameObjType.AITank));
+            gameObjects.add(new ShootingTank(collisionHanler, coord, Direction.Right, GameObjType.AITank));
         }
-        registerAITanksActions();
     }
 
     public void notifyAboutAllObjects() {
@@ -59,8 +56,6 @@ public class Level {
     }
 
     public void gameLogicTick(float deltaTime) {
-        aiTanksActions.handleActions();
-
         for (GameObj gameObj : gameObjects) {
             gameObj.recalculate_state(deltaTime);
             if (gameObj.getHeath() <= 0) {
@@ -75,16 +70,7 @@ public class Level {
         return gameObjects;
     }
 
-    private void registerAITanksActions() {
-        for (GameObj gameObj : gameObjects) {
-            if (gameObj.getType() == GameObjType.AITank) {
-                ShootingObj shootingObj = (ShootingObj)gameObj;
-                aiTanksActions.registerAction(TankAI.getDefaultAITankAction(shootingObj, this));
-            }
-        }
-    }
-
-    public ShootingObj getPlayerTank() {
+    public ShootingTank getPlayerTank() {
         return playerTank;
     }
 }
